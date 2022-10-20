@@ -35,7 +35,10 @@ class _FormIsiState extends State<FormIsi> {
   TextEditingController nama = TextEditingController();
   TextEditingController alamat = TextEditingController();
   TextEditingController dateinput =  TextEditingController();
-
+  TextEditingController ipk =  TextEditingController();
+  String? _gender = 'Pria';
+  String selectedAgama = '';
+  bool _passwordVisible = false;
   bool dateEdit = false;
   final GlobalKey<FormState> _keyform = GlobalKey<FormState>();
 
@@ -162,6 +165,16 @@ class _FormIsiState extends State<FormIsi> {
                   )),
                   SizedBox(width: 20,),
                   Flexible(child: TextFormField(
+                    controller: ipk,
+                    validator: (value){
+                      bool nilaiValidator = RegExp(r'[a-zA-Z,-]').hasMatch(value.toString());
+                      if(value == null || value.isEmpty || value.toString() == "."){
+                        return 'Mohon Isikan IPK';
+                      } else if (nilaiValidator || double.parse(value)>4){
+                        return 'Isi Nilai IPK Belum Benar';
+                      }
+                      return null;
+                    },
                     style: TextStyle(
                       color: Colors.purple,
                     ),
@@ -182,6 +195,66 @@ class _FormIsiState extends State<FormIsi> {
                   )),
                 ],
               ),
+              TextFormField(
+                obscureText: !_passwordVisible,
+                autocorrect: false,
+                //controller: ,
+                validator: (value){
+                  return (value!.isEmpty?
+                  "Password Tidak Boleh Kosong" : null);
+                },
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  hintText: 'Masukkan Password',
+                  labelStyle: TextStyle(
+                    color: Colors.deepPurple,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _passwordVisible? Icons.visibility : Icons.visibility_off,
+                      color: Theme.of(context).primaryColorDark,
+                    ),
+                    onPressed: (){
+                      setState(() {
+                        _passwordVisible = !_passwordVisible;
+                      });
+                    },
+                  ),
+                  prefixIcon: Icon(Icons.lock),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              DropdownButtonFormField<String>(
+                isExpanded: true,
+                //controller: ,
+                validator: (value) => value ==null ? 'Agama Harus Dipilih' : null,
+                items: <String>['Katolik', 'Kristen', 'Islam', 'Budha', 'Hindu'].map((String value)
+                {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (value){
+                  setState(() {
+                    selectedAgama = value!;
+                  });
+                },
+                decoration: InputDecoration(
+                  labelText: 'Pilih Agama',
+                  labelStyle: TextStyle(
+                    color: Colors.deepPurple,
+                  ),
+                  //prefixIcon: Icon(Icons.home),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20,),
+              genderField(),
               SizedBox(height: 20,),
               ElevatedButton(onPressed: (){
                 if(_keyform.currentState!.validate()){
@@ -195,83 +268,113 @@ class _FormIsiState extends State<FormIsi> {
       ),
     );
   }
+  Widget Header(){
+    return Container(
+      margin: EdgeInsets.only(left: 60,right: 40,bottom: 30),
+      child:  Align(
+          alignment: AlignmentDirectional.center,
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: 1,child: Image(image: AssetImage('images/git.png')),
+                ),
+                SizedBox(width: 60,),
+                Expanded(
+                    flex:1,
+                    child: Container(
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft
+                            , child: Container(
+                            child :RichText(
+                                text: TextSpan(
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold
+                                    ),
+                                    text: "Nama : ",
+                                    children: <TextSpan>[
+                                      TextSpan(text: ' Yosef Adrian ', style: TextStyle(fontStyle: FontStyle.italic,
+                                          fontWeight: FontWeight.normal)),
+                                    ]
+                                )),
+                          ),
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft
+                            , child: Container(
+                            child :  RichText(
+                                text: TextSpan(
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                    text: "NPM : ",
+                                    children: <TextSpan>[
+                                      TextSpan(text: ' 2020130002 ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    ]
+                                )),
+                          ),),
+                          Align(
+                            alignment: Alignment.centerLeft
+                            , child: Container(
+                            child :  RichText(
+                                text: TextSpan(
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'Roboto-Mono',
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                    text: "Jurusan : ",
+                                    children: <TextSpan>[
+                                      TextSpan(text: ' Teknik Informatika ', style: TextStyle(fontWeight: FontWeight.bold,
+                                          fontStyle: FontStyle.normal)),
+                                    ]
+                                )),
+                          ),),
+                        ],
+                      ),
+                    )
+                ),
+              ],
+            ),
+          )
+      ),
+    );
+  }
+
+  Widget genderField(){
+    return Row(
+      children: [
+        Flexible(
+          child: RadioListTile(
+            value: 'Pria',
+            groupValue: _gender,
+            onChanged: (String? value){
+              setState(() {
+                _gender = value;
+              });
+            },
+            title: const Text("Pria"),
+          ),
+        ),
+        Flexible(child: RadioListTile(
+          value: 'Wanita',
+          groupValue: _gender,
+          onChanged: (String? value){
+            setState(() {
+              _gender=value;
+            });
+          },
+          title: const Text("Wanita"),
+        )),
+      ],
+    );
+  }
 }
 
-Widget Header(){
-  return Container(
-    margin: EdgeInsets.only(left: 60,right: 40,bottom: 30),
-    child:  Align(
-      alignment: AlignmentDirectional.center,
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 1,child: Image(image: AssetImage('images/git.png')),
-            ),
-            SizedBox(width: 60,),
-            Expanded(
-                flex:1,
-                child: Container(
-                  child: Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft
-                        , child: Container(
-                        child :RichText(
-                            text: TextSpan(
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold
-                                ),
-                                text: "Nama : ",
-                                children: <TextSpan>[
-                                  TextSpan(text: ' Yosef Adrian ', style: TextStyle(fontStyle: FontStyle.italic,
-                                      fontWeight: FontWeight.normal)),
-                                ]
-                            )),
-                      ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerLeft
-                        , child: Container(
-                        child :  RichText(
-                            text: TextSpan(
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                                text: "NPM : ",
-                                children: <TextSpan>[
-                                  TextSpan(text: ' 2020130002 ', style: TextStyle(fontWeight: FontWeight.bold)),
-                                ]
-                            )),
-                      ),),
-                      Align(
-                        alignment: Alignment.centerLeft
-                        , child: Container(
-                        child :  RichText(
-                            text: TextSpan(
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontFamily: 'Roboto-Mono',
-                                  fontStyle: FontStyle.italic,
-                                ),
-                                text: "Jurusan : ",
-                                children: <TextSpan>[
-                                  TextSpan(text: ' Teknik Informatika ', style: TextStyle(fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.normal)),
-                                ]
-                            )),
-                      ),),
-                    ],
-                  ),
-                )
-            ),
-          ],
-        ),
-      )
-    ),
-  );
-}
+
 
 
