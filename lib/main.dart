@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +15,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        fontFamily: 'Roboto-Mono',
+      ),
       home: Scaffold(
           appBar: AppBar(
             title: Text('Latihan'),
@@ -36,6 +41,11 @@ class _FormIsiState extends State<FormIsi> {
   TextEditingController alamat = TextEditingController();
   TextEditingController dateinput =  TextEditingController();
   TextEditingController ipk =  TextEditingController();
+  TextEditingController pass = TextEditingController();
+
+  TextEditingController umur = TextEditingController();
+  TextEditingController indexipk = TextEditingController();
+  TextEditingController passagama = TextEditingController();
   String? _gender = 'Pria';
   String selectedAgama = '';
   bool _passwordVisible = false;
@@ -67,13 +77,13 @@ class _FormIsiState extends State<FormIsi> {
                   return null;
                 },
                 style: TextStyle(
+                  fontFamily: 'Roboto-Mono',
                   color: Colors.purple,
                 ),
                 decoration: InputDecoration(
                   labelText: "Nama",
                     icon: Icon(Icons.person),
-                    suffixIcon: Icon(Icons.remove_red_eye_outlined),
-                    //prefixIcon: Icon(Icons.ac_unit),
+                       //prefixIcon: Icon(Icons.ac_unit),
                     hoverColor: Colors.deepPurple,
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -106,8 +116,7 @@ class _FormIsiState extends State<FormIsi> {
                   labelText: "NPM",
                     hintText: "2020xxxxx",
                     icon: Icon(Icons.numbers),
-                    suffixIcon: Icon(Icons.remove_red_eye_outlined),
-                    //prefixIcon: Icon(Icons.ac_unit),
+                     //prefixIcon: Icon(Icons.ac_unit),
                     hoverColor: Colors.deepPurple,
                     enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -122,14 +131,20 @@ class _FormIsiState extends State<FormIsi> {
               Row(
                 children: <Widget>[
                   Flexible(child: TextFormField(
+                    validator: (value){
+                      if(value==null|| value.isEmpty || value==''){
+                        return 'Tanggal Lahir Belum Dipilih!!!';
+                      }
+                      return null;
+                    },
                     controller: dateinput,
                     readOnly: true,
                     onTap: () async{
                       DateTime? pickedDate = await showDatePicker(
                           context: context,
                           initialDate: DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2101));
+                          firstDate: DateTime(DateTime.now().year-100),
+                          lastDate: DateTime(DateTime.now().year+100));
                       if(pickedDate != null) {
                         String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
                         setState(() {
@@ -144,11 +159,11 @@ class _FormIsiState extends State<FormIsi> {
                         labelText: 'Tanggal Lahir',
                         icon: Icon(Icons.date_range),
                         suffixIcon: IconButton(
-                          icon : Icon(
-                              dateEdit? Icons.cancel: Icons.cancel_outlined),
+                          icon : Icon(Icons.cancel),
                           onPressed: (){
                             setState(() {
                                 dateEdit = !dateEdit;
+                                dateinput.text = '';
                             });
                           },
                         ),
@@ -195,7 +210,9 @@ class _FormIsiState extends State<FormIsi> {
                   )),
                 ],
               ),
+              SizedBox(height: 20,),
               TextFormField(
+                controller: pass,
                 obscureText: !_passwordVisible,
                 autocorrect: false,
                 //controller: ,
@@ -220,12 +237,13 @@ class _FormIsiState extends State<FormIsi> {
                       });
                     },
                   ),
-                  prefixIcon: Icon(Icons.lock),
+                  icon : Icon(Icons.lock),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               ),
+              SizedBox(height: 20,),
               DropdownButtonFormField<String>(
                 isExpanded: true,
                 //controller: ,
@@ -243,6 +261,7 @@ class _FormIsiState extends State<FormIsi> {
                   });
                 },
                 decoration: InputDecoration(
+                  icon: Icon(Icons.accessibility_new_outlined),
                   labelText: 'Pilih Agama',
                   labelStyle: TextStyle(
                     color: Colors.deepPurple,
@@ -258,10 +277,76 @@ class _FormIsiState extends State<FormIsi> {
               SizedBox(height: 20,),
               ElevatedButton(onPressed: (){
                 if(_keyform.currentState!.validate()){
+                  String index = "E";
+                  double a = double.parse(ipk.text);
+                  if(a>3){
+                    index = "A";
+                  } else if (a>2){
+                    index = "B";
+                  } else if (a>1){
+                    index = "C";
+                  } else if (a>0){
+                    index = "D";
+                  }
 
+                  int tahunmasuk = int.parse(alamat.text.substring(0,4));
+                  int tahunlahir = int.parse(dateinput.text.substring(6,10));
+                  int tahunsekarang = int.parse(DateTime.now().year.toString());
+                  int hasilumur = tahunsekarang - tahunlahir;
+
+                  String passag = selectedAgama + " " + pass.text.toString();
+                  //Print Ke TextFormField
+                  indexipk.value = indexipk.value.copyWith(
+                    text: index,
+                    selection: TextSelection.collapsed(offset: index.length)
+                  );
+
+                  //Print Umur
+                  umur.value = umur.value.copyWith(
+                    text: hasilumur.toString(),
+                    selection:  TextSelection.collapsed(offset: hasilumur.toString().length)
+                  );
+
+                  //Print passagama
+                  passagama.value = passagama.value.copyWith(
+                    text: passag,
+                    selection: TextSelection.collapsed(offset: passag.length)
+                  );
+
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Data Nilai Belum Lengkap....."))
+                  );
                 }
               },
                   child: Text("Submit")),
+              Row(
+                children: [
+                  Flexible( flex: 1,child:  TextFormField(
+                    readOnly: true,
+                    controller: umur,
+                    decoration: InputDecoration(
+                      labelText: 'Umur',
+                    ),
+                  )),
+                  SizedBox(width: 10,),
+                  Flexible(flex: 1,child:  TextFormField(
+                    readOnly: true,
+                    controller: indexipk,
+                    decoration: InputDecoration(
+                      labelText: 'IPK INDEX',
+                    ),
+                  )),
+                  SizedBox(width: 10,),
+                  Flexible(flex: 1,child:  TextFormField(
+                    readOnly: true,
+                    controller: passagama,
+                    decoration: InputDecoration(
+                      labelText: 'Pass + Agama',
+                    ),
+                  ))
+                ],
+              ),
             ],
           ),
         )
