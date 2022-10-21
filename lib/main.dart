@@ -320,6 +320,7 @@ class _FormIsiState extends State<FormIsi> {
                 }
               },
                   child: Text("Submit")),
+              SizedBox(height: 20,),
               Row(
                 children: [
                   Flexible( flex: 1,child:  TextFormField(
@@ -355,6 +356,23 @@ class _FormIsiState extends State<FormIsi> {
   }
   Widget Header(){
     return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.blueAccent),
+        //color: Colors.deepPurpleAccent,
+        gradient: LinearGradient(
+            begin:Alignment.topLeft,
+            end: Alignment(0.8,1),
+            colors: <Color>[
+              Color(0xff1f005c),
+              Color(0xff5b0060),
+              Color(0xff870160),
+              Color(0xffac255e),
+              Color(0xffca485c),
+              Color(0xffe16b5c),
+              Color(0xfff39060),
+              Color(0xffffb56b),
+        ]),
+      ),
       margin: EdgeInsets.only(left: 60,right: 40,bottom: 30),
       child:  Align(
           alignment: AlignmentDirectional.center,
